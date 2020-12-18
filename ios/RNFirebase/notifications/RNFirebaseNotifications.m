@@ -110,7 +110,9 @@ RCT_EXPORT_METHOD(complete:(NSString*)handlerKey fetchResult:(UIBackgroundFetchR
             void(^completionHandler)(void) = completionHandlers[handlerKey];
             if (completionHandler != nil) {
                 completionHandlers[handlerKey] = nil;
-                completionHandler();
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionHandler();
+                });
             }
         }
     }
@@ -222,7 +224,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void(^)())completionHandler NS_AVAILABLE_IOS(10_0) {
 #endif
      NSDictionary *message = [self parseUNNotificationResponse:response];
-           
+
      NSString *handlerKey = message[@"notification"][@"notificationId"];
 
      [self sendJSEvent:self name:NOTIFICATIONS_NOTIFICATION_OPENED body:message];
